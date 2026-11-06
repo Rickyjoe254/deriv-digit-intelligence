@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deriv Digit Intelligence</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d18;color:#e8eef8;font-family:Arial,sans-serif}
+header{padding:22px 16px;background:#101a2b;border-bottom:1px solid #26344a}
+.brand{font-size:21px;font-weight:800;color:#48d9cb}
+.sub{font-size:12px;color:#91a2bb;margin-top:7px}
+main{padding:16px;max-width:1050px;margin:auto}
+.panel{background:#111c2e;border:1px solid #26364d;border-radius:13px;padding:16px;margin-bottom:15px}
+h2{font-size:15px;margin:0 0 15px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+select,button{width:100%;padding:13px;border-radius:8px;border:1px solid #34445d;background:#17243a;color:white;font-size:14px}
+button{background:#087f79;border:0;font-weight:bold;cursor:pointer}
+.status{font-size:12px;color:#a5b4c9;margin-top:12px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-right:7px}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.metric{background:#17243a;border-radius:10px;padding:14px}
+.metric small{color:#91a2bb}
+.metric strong{display:block;font-size:23px;margin-top:8px}
+.green{color:#48d9cb}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.digit{background:#17243a;border-radius:8px;padding:10px 3px;text-align:center}
+.digit b{font-size:20px}
+.digit small{display:block;color:#91a2bb;font-size:10px;margin-top:6px}
+.bar{height:5px;background:#2a3b53;border-radius:5px;margin-top:8px;overflow:hidden}
+.fill{height:100%;background:#39c9bc}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:11px 5px;border-bottom:1px solid #29364b;text-align:left}
+th{color:#91a2bb;font-weight:normal}
+.muted{color:#91a2bb;font-size:12px;line-height:1.6}
+footer{text-align:center;padding:25px;color:#71829b;font-size:11px}
+@media(min-width:650px){.cards{grid-template-columns:repeat(4,1fr)}.controls{grid-template-columns:2fr 1fr 1fr}.grid{grid-template-columns:repeat(10,1fr)}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand">◆ DERIV DIGIT INTELLIGENCE</div>
+ <div class="sub">SYNTHETIC MARKET ANALYSIS TERMINAL</div>
+</header>
+<main>
+ <section class="panel">
+  <h2>LIVE MARKET CONNECTION</h2>
+  <div class="controls">
+   <select id="symbol">
+    <option value="R_10">Volatility 10 Index</option>
+    <option value="R_25">Volatility 25 Index</option>
+    <option value="R_50">Volatility 50 Index</option>
+    <option value="R_75">Volatility 75 Index</option>
+    <option value="R_100">Volatility 100 Index</option>
+    <option value="1HZ10V">Volatility 10 (1s)</option>
+    <option value="1HZ25V">Volatility 25 (1s)</option>
+    <option value="1HZ50V">Volatility 50 (1s)</option>
+    <option value="1HZ75V">Volatility 75 (1s)</option>
+    <option value="1HZ100V">Volatility 100 (1s)</option>
+   </select>
+   <select id="window">
+    <option value="100">Last 100 ticks</option>
+    <option value="500" selected>Last 500 ticks</option>
+    <option value="1000">Last 1000 ticks</option>
+   </select>
+   <button id="connect">CONNECT</button>
+  </div>
+  <div class="status"><span class="dot" id="dot"></span><span id="status">Not connected</span></div>
+ </section>
+
+ <section class="cards">
+  <div class="metric"><small>LIVE PRICE</small><strong id="price">--</strong></div>
+  <div class="metric"><small>TICKS ANALYZED</small><strong id="total">0</strong></div>
+  <div class="metric"><small>LAST DIGIT</small><strong class="green" id="last">--</strong></div>
+  <div class="metric"><small>MOST FREQUENT</small><strong id="hot">--</strong></div>
+ </section>
+
+ <section class="panel">
+  <h2>DIGIT FREQUENCY · 0–9</h2>
+  <div class="grid" id="digits"></div>
+  <p class="muted">Percentages show the share of each digit in the selected sample. They are historical measurements, not predictions.</p>
+ </section>
+
+ <section class="panel">
+  <h2>OVER / UNDER ANALYSIS</h2>
+  <table>
+   <thead><tr><th>Group</th><th>Occurrences</th><th>Frequency</th></tr></thead>
+   <tbody>
+    <tr><td>Under 5 (0–4)</td><td id="underCount">0</td><td id="underPct">0%</td></tr>
+    <tr><td>Over 4 (5–9)</td><td id="overCount">0</td><td id="overPct">0%</td></tr>
+   </tbody>
+  </table>
+ </section>
+
+ <section class="panel">
+  <h2>EVEN / ODD ANALYSIS</h2>
+  <table>
+   <thead><tr><th>Group</th><th>Occurrences</th><th>Frequency</th></tr></thead>
+   <tbody>
+    <tr><td>Even (0,2,4,6,8)</td><td id="evenCount">0</td><td id="evenPct">0%</td></tr>
+    <tr><td>Odd (1,3,5,7,9)</td><td id="oddCount">0</td><td id="oddPct">0%</td></tr>
+   </tbody>
+  </table>
+ </section>
+
+ <section class="panel">
+  <h2>RECENT DIGITS</h2>
+  <div id="recent" class="muted">Waiting for market data...</div>
+ </section>
+ <footer>DERIV DIGIT INTELLIGENCE · ANALYTICS ONLY<br>Historical frequencies do not guarantee future outcomes. Not financial advice.</footer>
+</main>
+
+<script>
+const APP_ID = 1089; // Testing app ID. Replace with your own registered ID for production.
+let socket = null;
+let ticks = [];
+let pipSize = 2;
+let currentSymbol = "R_10";
+let reconnectTimer = null;
+
+const $ = id => document.getElementById(id);
+
+function setStatus(message,connected=false){
+ $("status").textContent=message;
+ $("dot").style.background=connected?"#39d98a":"#f59e0b";
+}
+
+function getDigit(value,precision){
+ const formatted=Number(value).toFixed(precision);
+ return Number(formatted.replace(".","").slice(-1));
+}
+
+function addTick(quote,precision){
+ const digit=getDigit(quote,precision);
+ ticks.push({quote:Number(quote),digit});
+ if(ticks.length>1000)ticks.shift();
+ render();
+}
+
+function render(){
+ const limit=Number($("window").value);
+ const sample=ticks.slice(-limit);
+ const counts=Array(10).fill(0);
+ sample.forEach(t=>counts[t.digit]++);
+ const total=sample.length;
+ const pct=n=>total?((n/total)*100).toFixed(1)+"%":"0%";
+
+ $("total").textContent=total;
+ $("price").textContent=total?sample[total-1].quote.toFixed(pipSize):"--";
+ $("last").textContent=total?sample[total-1].digit:"--";
+
+ const highest=Math.max(...counts);
+ $("hot").textContent=total?counts.indexOf(highest)+" · "+pct(highest):"--";
+
+ $("digits").innerHTML=counts.map((n,i)=>`
+  <div class="digit">
+   <b>${i}</b>
+   <small>${n} · ${pct(n)}</small>
+   <div class="bar"><div class="fill" style="width:${total?n/total*100:0}%"></div></div>
+  </div>`).join("");
+
+ const under=counts.slice(0,5).reduce((a,b)=>a+b,0);
+ const over=counts.slice(5).reduce((a,b)=>a+b,0);
+ const even=counts.filter((n,i)=>i%2===0).reduce((a,b)=>a+b,0);
+ const odd=total-even;
+
+ $("underCount").textContent=under;
+ $("underPct").textContent=pct(under);
+ $("overCount").textContent=over;
+ $("overPct").textContent=pct(over);
+ $("evenCount").textContent=even;
+ $("evenPct").textContent=pct(even);
+ $("oddCount").textContent=odd;
+ $("oddPct").textContent=pct(odd);
+
+ $("recent").textContent=sample.slice(-30).map(t=>t.digit).join("  ·  ")||"Waiting for market data...";
+}
+
+function disconnect(){
+ clearTimeout(reconnectTimer);
+ if(socket){
+  socket.onclose=null;
+  socket.close();
+  socket=null;
+ }
+}
+
+function connect(){
+ disconnect();
+ ticks=[];
+ render();
+ currentSymbol=$("symbol").value;
+ setStatus("Connecting to Deriv...");
+ $("connect").textContent="CONNECTING...";
+
+ socket=new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+
+ socket.onopen=()=>{
+  setStatus("Connected · Loading historical ticks",true);
+  $("connect").textContent="CONNECTED";
+  socket.send(JSON.stringify({
+   ticks_history:currentSymbol,
+   count:1000,
+   end:"latest",
+   style:"ticks"
+  }));
+ };
+
+ socket.onmessage=event=>{
+  const data=JSON.parse(event.data);
+
+  if(data.error){
+   setStatus("API error: "+data.error.message);
+   $("connect").textContent="RETRY";
+   return;
+  }
+
+  if(data.msg_type==="history" && data.history){
+   pipSize=Number(data.pip_size||2);
+   data.history.prices.forEach(price=>addTick(price,pipSize));
+   setStatus("Live · "+currentSymbol,true);
+   socket.send(JSON.stringify({ticks:currentSymbol,subscribe:1}));
+  }
+
+  if(data.msg_type==="tick" && data.tick){
+   pipSize=Number(data.tick.pip_size||pipSize);
+   addTick(data.tick.quote,pipSize);
+   setStatus("Live · "+currentSymbol,true);
+  }
+ };
+
+ socket.onerror=()=>{
+  setStatus("Connection error. Check your internet or API access.");
+  $("connect").textContent="RETRY";
+ };
+
+ socket.onclose=()=>{
+  setStatus("Disconnected · Tap CONNECT to retry");
+  $("connect").textContent="CONNECT";
+ };
+}
+
+$("connect").addEventListener("click",connect);
+$("symbol").addEventListener("change",connect);
+$("window").addEventListener("change",render);
+
+render();
+connect();
+</script>
+</body>
+</html>
