@@ -194,7 +194,9 @@ function connect(){
  setStatus("Connecting to Deriv...");
  $("connect").textContent="CONNECTING...";
 
- socket=new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+ socket=new WebSocket(
+ "wss://api.derivws.com/trading/v1/options/ws/public"
+);
 
  socket.onopen=()=>{
   setStatus("Connected · Loading historical ticks",true);
